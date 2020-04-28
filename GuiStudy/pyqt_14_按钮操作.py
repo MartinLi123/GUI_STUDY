@@ -23,11 +23,24 @@ class Window(QWidget):
         self.setWindowTitle(tittle)
         assert len(size) == 2
         self.resize(size[0], size[1])
-        self.set_菜单的设置()
+        self.set_长按自动重复按钮()
 
-        exitAct = QAction(self)
-        exitAct.setShortcut('Alt+q')
-        exitAct.triggered.connect(qApp.quit)
+        #  设置右键菜单--方法2  优先级高
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.set_menu)
+
+    def show_menu(self, point):
+        print("开启了右键菜单")
+        print(point)
+
+    #  设置右键菜单--方法1 优先级低
+    #  右键被点击后，会执行contextMenuEvent下的操作
+    #  需要重写该方法自定义右键菜单
+    def contextMenuEvent(self, evt):
+        #  获取鼠标点击坐标， 将该坐标传给 set_菜单的设置 作为参数设置菜单显示位置
+        print("打开右键菜单")
+        print(evt.globalPos())
+        self.set_menu(evt.globalPos())
 
     def setup_ui(self):
         btn1 = QPushButton("按钮1", self)
@@ -124,18 +137,15 @@ class Window(QWidget):
         btn1.pressed.connect(lambda : print(" presssed "))
         btn1.toggled.connect(lambda : print(" 状态发生了反转 "))
 
-    def set_菜单的设置(self):
+    def set_menu(self, qpoint=QPoint(0, 0)):
+
         btn1 = QPushButton("按钮", self)
         btn1.setIcon(QIcon("icon_imgs/scanner.png"))
-        btn1.setGeometry(100, 100, 200, 100)
+        # btn1.setGeometry(100, 100, 200, 100)
         btn1.setFlat(True)
         # btn1.setCheckable(True)
 
         menu = QMenu()
-
-
-
-
 
         # menu.setTitle("操作")
         # 不设定父类则在函数执行完毕后会销毁
@@ -157,7 +167,23 @@ class Window(QWidget):
 
 
         btn1.setMenu(menu)
-        btn1.showMenu()
+        # 此时传入的是相对于app窗口的坐标而不是相对于屏幕 global 的坐标， 需要转化
+        glb_point = self.mapToGlobal(qpoint)
+        menu.exec_(glb_point)
+        # btn1.showMenu()
+
+    def set_按钮的默认处理(self):
+        btn1 = QPushButton("按钮1", self)
+        btn1.setIcon(QIcon("icon_imgs/scanner.png"))
+        btn1.setGeometry(100, 200, 200, 100)
+        btn1.setDefault(True)  # 直接设置为默认
+
+        btn2 = QPushButton("按钮2", self)
+        btn2.setGeometry(100, 0, 200, 100)
+        btn2.setAutoDefault(True)  # 按钮被点击后才会被设置为默认
+
+        print(btn1.autoDefault())
+        print(btn2.autoDefault())
 
 
 if __name__ == '__main__':
