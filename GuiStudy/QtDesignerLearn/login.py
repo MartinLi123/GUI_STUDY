@@ -43,9 +43,13 @@ class Ui_Dialog(object):
         self.label.setText(_translate("Dialog", "用户名"))
         self.label_2.setText(_translate("Dialog", "密码"))
         self.pushButton.setText(_translate("Dialog", "登录"))
+
+
 import test_source_rc
 
 
+# 一般补直接在ui转化的py文件下进行修改，因为更改了ui之后转化的py文件也会变化
+# 一般是将该界面文件作为模块导入
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
